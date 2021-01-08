@@ -9,8 +9,8 @@
 #define FIREBASE_AUTH "4D7DcGhyQCnAX3CbjExrysiQ0PGsWQL1FAhCJr6Y"   
 
 // you have to enter your wifi ssd and the password
-#define WIFI_SSID "SLT-ADSL-8749D"               
-#define WIFI_PASSWORD "Dinidu19971103"
+#define WIFI_SSID "put you wifi ssid"               
+#define WIFI_PASSWORD "put you password"
 
 // delay you want before the Relay turned off
 #define DELAY 20
@@ -47,20 +47,20 @@ void setup() {
 
 void loop() {
   // getting the door status from the firebase
-  String fireStatus = Firebase.getString("DoorStatus");
+  String fireStatus = Firebase.getString("doorStatus/DoorStatus");
 
   if (fireStatus == "Open") {
     // turn on the relay
     digitalWrite(2, HIGH);
     // wait for 20s
-    delay(20000);
+    delay(DELAY*1000);
     // turn off the relay
     digitalWrite(2, LOW);
     // set the status of the firebase
-    Firebase.setString("DoorStatus", "Close");
+    Firebase.setString("doorStatus/DoorStatus", "Close");
   }
 
   // delay before next reading
-  delay(DELAY*1000);
+  delay(1000);
 
 }

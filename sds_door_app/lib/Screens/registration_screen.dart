@@ -10,6 +10,10 @@ import 'package:sds_door_app/components/rounded_password_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_image/firebase_image.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class RegistrationScreen extends StatefulWidget {
   @override
@@ -20,8 +24,28 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _auth = FirebaseAuth.instance;
   String _email;
   String _password;
+  String _cpassword;
   String _name;
   bool showSpinner = false;
+  String imageName;
+
+  void loadImage() async {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    await databaseReference
+        .child('imageName')
+        .once()
+        .then((DataSnapshot snapshot1) {
+      setState(() {
+        imageName = snapshot1.value;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    loadImage();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +63,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   width: size.width * 0.5,
                   height: size.width * 0.5,
                   child: Image(
-                    image: AssetImage("assets/images/sds_logo.jpeg"),
+                    image: imageName == null
+                        ? AssetImage("assets/images/sds_logo.jpeg")
+                        : FirebaseImage(
+                            "gs://door-app-12838.appspot.com/images/$imageName"),
                   ),
                 ),
                 RoundedInputField(
@@ -63,35 +90,92 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 RoundedPasswordField(
                   hintText: 'Confirm your password here...',
                   onChanged: (value) {
-                    _password = value;
+                    _cpassword = value;
                   },
                 ),
                 RoundedButton(
                   text: 'REGISTER',
                   press: () async {
-                    setState(() {
-                      showSpinner = true;
-                    });
-                    try {
-                      final newUser =
-                          await _auth.createUserWithEmailAndPassword(
-                              email: _email, password: _password);
-                      SharedPreferences pref =
-                          await SharedPreferences.getInstance();
-                      pref.setString('email', _email);
-                      pref.setString('name', _name);
-                      if (newUser != null) {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MainScreen()),
-                            ModalRoute.withName("/Home"));
+                    if ((_password != null &&
+                        _cpassword != null &&
+                        _email != null)) {
+                      setState(() {
+                        showSpinner = true;
+                      });
+                      if (_password.length >= 6) {
+                        if (_password == _cpassword) {
+                          try {
+                            final newUser =
+                                await _auth.createUserWithEmailAndPassword(
+                                    email: _email, password: _password);
+                            SharedPreferences pref =
+                                await SharedPreferences.getInstance();
+                            pref.setString('email', _email);
+                            pref.setString('name', _name);
+                            if (newUser != null) {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MainScreen()),
+                                  ModalRoute.withName("/Home"));
+                              setState(() {
+                                showSpinner = false;
+                              });
+                            }
+                          } catch (e) {
+                            Fluttertoast.showToast(
+                                msg: 'Something went wrong',
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.white,
+                                textColor: Colors.black,
+                                fontSize: 16.0);
+                            setState(() {
+                              showSpinner = false;
+                            });
+                            print(e);
+                          }
+                        } else {
+                          Fluttertoast.showToast(
+                              msg:
+                                  'Your password and confirmed password don\'t match',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.white,
+                              textColor: Colors.black,
+                              fontSize: 16.0);
+                          setState(() {
+                            showSpinner = false;
+                          });
+                        }
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                'Your password length should be greater than 5',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.white,
+                            textColor: Colors.black,
+                            fontSize: 16.0);
                         setState(() {
                           showSpinner = false;
                         });
                       }
-                    } catch (e) {
-                      print(e);
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: 'Please fill the form correctly',
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.white,
+                          textColor: Colors.black,
+                          fontSize: 16.0);
+                      setState(() {
+                        showSpinner = false;
+                      });
                     }
                   },
                   color: kPrimaryColor,
