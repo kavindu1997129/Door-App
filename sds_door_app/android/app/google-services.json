@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "714039102434",
+    "project_id": "door-app-12838",
+    "storage_bucket": "door-app-12838.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714039102434:android:25560d333a38058ae107bb",
+        "android_client_info": {
+          "package_name": "com.example.sds_door_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714039102434-53q0plkcnosuk6jeee98718v1l2ul207.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmtCsvcgDPIEPIct-ev9Qr_47kWH3Q8KI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714039102434-53q0plkcnosuk6jeee98718v1l2ul207.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

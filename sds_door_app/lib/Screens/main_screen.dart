@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+import 'package:sds_door_app/Constants/constant.dart';
+import 'package:sds_door_app/Widgets/navigation_drawer.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+class MainScreen extends StatefulWidget {
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'DOOR OPEN APP'
+        )
+      ),
+      body: Center(
+        child: Container(
+          width: size.width * 0.7,
+          height: size.height * 0.1,
+          child: FlatButton(
+            color: kPrimaryColor,
+            child: Text(
+              'Open the door!',
+              style: TextStyle(fontSize: 30, color: Colors.white),
+            ),
+            onPressed: () {
+              DatabaseReference data = FirebaseDatabase.instance.reference();
+              data.set({'DoorStatus': "Open"});
+            },
+          ),
+        ),
+      ),
+      drawer: DrawerCustom(),
+    );
+  }
+}
